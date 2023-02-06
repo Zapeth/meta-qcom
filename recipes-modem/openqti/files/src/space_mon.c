@@ -83,10 +83,10 @@ int cleanup_storage(int storage_id, bool aggressive, char *exclude_file) {
         }
       }
     }
+    closedir(dp);
   } else {
     logger(MSG_ERROR, "%s: Error opening directory %s\n", __func__, path);
   }
-  closedir(dp);
   free(path);
 
   return 0;

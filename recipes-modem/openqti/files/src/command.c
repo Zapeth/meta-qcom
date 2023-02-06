@@ -89,7 +89,7 @@ uint8_t parse_command(uint8_t *command) {
   int cmd_id = -1;
   int strsz = 0;
   pthread_t disposable_thread;
-  char lowercase_cmd[160];
+  char lowercase_cmd[MAX_MESSAGE_SIZE];
   uint8_t reply[MAX_MESSAGE_SIZE] = {0};
   srand(time(NULL));
 
@@ -169,7 +169,7 @@ uint8_t parse_command(uint8_t *command) {
     break;
   case CMD_ID_GET_HISTORY:
     for (uint8_t i = 0; i < cmd_runtime.cmd_position; i++) {
-      if (strsz < 160) {
+      if (strsz < MAX_MESSAGE_SIZE) {
         strsz += snprintf((char *)reply + strsz, MAX_MESSAGE_SIZE - strsz,
                           "%i ", cmd_runtime.cmd_history[i]);
       }

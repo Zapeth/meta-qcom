@@ -434,11 +434,6 @@ void *simulated_call_tts_handler() {
       pcm_close(pcm0);
       return NULL;
     }
-
-    if (!pcm0) {
-      logger(MSG_ERROR, "%s: Unable to open PCM device\n", __func__);
-      return NULL;
-    }
   }
   /* Set cpu governor to performance to speed it up a bit */
   enable_cpufreq_performance_mode(true);
@@ -482,9 +477,9 @@ void *simulated_call_tts_handler() {
 
     if (!buffer) {
       logger(MSG_ERROR, "Unable to allocate %d bytes\n", size);
-      free(buffer);
-      buffer = NULL;
       speech_to_text_stay_running(0);
+      fclose(file);
+      pcm_close(pcm0);
       return NULL;
     }
 

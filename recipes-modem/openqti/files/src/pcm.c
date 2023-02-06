@@ -45,7 +45,7 @@ static inline struct snd_mask *param_to_mask(struct snd_pcm_hw_params *p,
                                              int n) {
   return &(p->masks[n - SNDRV_PCM_HW_PARAM_FIRST_MASK]);
 }
-int param_set_sw_params(struct pcm *pcm, struct snd_pcm_sw_params *sparams) {
+static int param_set_sw_params(struct pcm *pcm, struct snd_pcm_sw_params *sparams) {
   if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_SW_PARAMS, sparams)) {
     return -EPERM;
   }
@@ -53,19 +53,19 @@ int param_set_sw_params(struct pcm *pcm, struct snd_pcm_sw_params *sparams) {
   return 0;
 }
 
-int pcm_buffer_size(struct snd_pcm_hw_params *params) {
+static int pcm_buffer_size(struct snd_pcm_hw_params *params) {
   struct snd_interval *i =
       param_to_interval(params, SNDRV_PCM_HW_PARAM_BUFFER_BYTES);
   return i->min;
 }
 
-int pcm_period_size(struct snd_pcm_hw_params *params) {
+static int pcm_period_size(struct snd_pcm_hw_params *params) {
   struct snd_interval *i =
       param_to_interval(params, SNDRV_PCM_HW_PARAM_PERIOD_BYTES);
   return i->min;
 }
 
-void param_set_mask(struct snd_pcm_hw_params *p, int n, unsigned bit) {
+static void param_set_mask(struct snd_pcm_hw_params *p, int n, unsigned bit) {
   if (bit >= SNDRV_MASK_MAX)
     return;
   if (param_is_mask(n)) {
@@ -76,7 +76,7 @@ void param_set_mask(struct snd_pcm_hw_params *p, int n, unsigned bit) {
   }
 }
 
-void param_init(struct snd_pcm_hw_params *p) {
+static void param_init(struct snd_pcm_hw_params *p) {
   int n;
   memset(p, 0, sizeof(*p));
   for (n = SNDRV_PCM_HW_PARAM_FIRST_MASK; n <= SNDRV_PCM_HW_PARAM_LAST_MASK;
@@ -93,21 +93,14 @@ void param_init(struct snd_pcm_hw_params *p) {
   }
 }
 
-void param_set_min(struct snd_pcm_hw_params *p, int n, unsigned val) {
+static void param_set_min(struct snd_pcm_hw_params *p, int n, unsigned val) {
   if (param_is_interval(n)) {
     struct snd_interval *i = param_to_interval(p, n);
     i->min = val;
   }
 }
 
-void param_set_max(struct snd_pcm_hw_params *p, int n, unsigned val) {
-  if (param_is_interval(n)) {
-    struct snd_interval *i = param_to_interval(p, n);
-    i->max = val;
-  }
-}
-
-void param_set_int(struct snd_pcm_hw_params *p, int n, unsigned val) {
+static void param_set_int(struct snd_pcm_hw_params *p, int n, unsigned val) {
   if (param_is_interval(n)) {
     struct snd_interval *i = param_to_interval(p, n);
     i->min = val;
@@ -116,14 +109,14 @@ void param_set_int(struct snd_pcm_hw_params *p, int n, unsigned val) {
   }
 }
 
-int param_set_hw_refine(struct pcm *pcm, struct snd_pcm_hw_params *params) {
+static int param_set_hw_refine(struct pcm *pcm, struct snd_pcm_hw_params *params) {
   if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_HW_REFINE, params)) {
     return -EPERM;
   }
   return 0;
 }
 
-int param_set_hw_params(struct pcm *pcm, struct snd_pcm_hw_params *params) {
+static int param_set_hw_params(struct pcm *pcm, struct snd_pcm_hw_params *params) {
   if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_HW_PARAMS, params)) {
     return -EPERM;
   }
@@ -159,6 +152,7 @@ int set_params(struct pcm *pcm, int path) {
   param_set_hw_refine(pcm, params);
   if (param_set_hw_params(pcm, params)) {
     logger(MSG_ERROR, "%s: cannot set hw params\n", __func__);
+    free(params);
     return -1;
   }
 
@@ -193,6 +187,7 @@ int set_params(struct pcm *pcm, int path) {
 
   if (param_set_sw_params(pcm, sparams)) {
     logger(MSG_ERROR, "%s: cannot set sw params", __func__);
+    free(sparams);
     return -1;
   }
   return 0;
@@ -280,7 +275,7 @@ int sync_ptr(struct pcm *pcm) {
 
 int pcm_prepare(struct pcm *pcm) {
   if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_PREPARE)) {
-    logger(MSG_ERROR, "cannot prepare channel: errno =%d\n", -errno);
+    logger(MSG_ERROR, "cannot prepare channel: errno =%d\n", errno);
     return -errno;
   }
   pcm->running = 1;

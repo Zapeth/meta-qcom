@@ -56,26 +56,26 @@ signal_tracking_operating mode (requires signal_tracking ON and PERSIST)
 */
 
 /* Set mount as readwrite or readonly */
-int set_persistent_partition_rw();
-int set_persistent_partition_ro();
-void do_sync_fs();
+int set_persistent_partition_rw(void);
+int set_persistent_partition_ro(void);
+void do_sync_fs(void);
 
-int set_initial_config();
-int read_settings_from_file();
+int set_initial_config(void);
+int read_settings_from_file(void);
 
 /* Signal tracking */
-uint8_t is_signal_tracking_enabled();
-uint8_t get_signal_tracking_mode();
+uint8_t is_signal_tracking_enabled(void);
+uint8_t get_signal_tracking_mode(void);
 void enable_signal_tracking(bool en);
 void set_signal_tracking_mode(uint8_t mode);
 
-uint8_t is_signal_tracking_downgrade_notification_enabled();
-uint8_t get_signal_tracking_cell_change_notification_mode();
+uint8_t is_signal_tracking_downgrade_notification_enabled(void);
+uint8_t get_signal_tracking_cell_change_notification_mode(void);
 void set_signal_tracking_downgrade_notification(uint8_t enable);
 void set_signal_tracking_cell_change_notification(uint8_t mode);
 
 /* Custom alert tone */
-uint8_t use_custom_alert_tone();
+uint8_t use_custom_alert_tone(void);
 void set_custom_alert_tone(bool en);
 
 /* Modem Name */
@@ -86,39 +86,40 @@ uint8_t get_user_name(char *buff);
 void set_user_name(char *name);
 
 /* Persistent logging */
-uint8_t use_persistent_logging();
+uint8_t use_persistent_logging(void);
 void set_persistent_logging(bool en);
-char *get_openqti_logfile();
-char *get_default_logpath();
+char *get_openqti_logfile(void);
+char *get_default_logpath(void);
 /* Is first boot? */
-bool is_first_boot();
-void clear_ifrst_boot_flag();
+bool is_first_boot(void);
+void clear_ifrst_boot_flag(void);
+int write_boot_counter_file(int failed_boots);
 
 /* SMS logging */
-uint8_t is_sms_logging_enabled();
+uint8_t is_sms_logging_enabled(void);
 void set_sms_logging(bool en);
 
 /* List All Bypass */
-uint8_t is_sms_list_all_bypass_enabled();
+uint8_t is_sms_list_all_bypass_enabled(void);
 void set_list_all_bypass(bool en);
 /* Automatically hang up call waiting */
-uint8_t callwait_auto_hangup_operation_mode();
+uint8_t callwait_auto_hangup_operation_mode(void);
 void enable_call_waiting_autohangup(uint8_t en);
 
 /* Automatic call recording */
-uint8_t is_automatic_call_recording_enabled();
+uint8_t is_automatic_call_recording_enabled(void);
 void set_automatic_call_recording(uint8_t mode);
 
 /* Internal Networking */
 /* Getters */
-uint8_t is_internal_connect_enabled();
-char *get_signal_tracking_mode_text();
-char *get_signal_tracking_cell_change_notification_mode_text();
-char *get_internal_network_apn_name();
-char *get_internal_network_username();
-char *get_internal_network_pass();
-char *get_internal_network_auth_method_text();
-uint8_t get_internal_network_auth_method();
+uint8_t is_internal_connect_enabled(void);
+char *get_signal_tracking_mode_text(void);
+char *get_signal_tracking_cell_change_notification_mode_text(void);
+char *get_internal_network_apn_name(void);
+char *get_internal_network_username(void);
+char *get_internal_network_pass(void);
+char *get_internal_network_auth_method_text(void);
+uint8_t get_internal_network_auth_method(void);
 /* Setters */
 void set_internal_connectivity(bool en);
 void set_internal_network_apn_name(char *apn);
@@ -127,20 +128,20 @@ void set_internal_network_pass(char *pass);
 void set_internal_network_auth_method(uint8_t method);
 
 /* Automatically export cell location data as CSV */
-uint8_t get_dump_network_tables_config();
+uint8_t get_dump_network_tables_config(void);
 void enable_dump_network_tables(bool en);
-char *get_rt_modem_name();
-char *get_rt_user_name();
+char *get_rt_modem_name(void);
+char *get_rt_user_name(void);
 
 
 /* Internal IMS client */
 /* We don't want setters right now */
-char *get_ims_network_apn_name();
-char *get_ims_network_username();
-char *get_ims_network_pass();
-uint8_t is_ims_enabled();
-uint8_t is_ims_vt_support_enabled();
-uint8_t is_ims_rtp_support_enabled();
-uint8_t is_ims_sms_support_enabled();
+char *get_ims_network_apn_name(void);
+char *get_ims_network_username(void);
+char *get_ims_network_pass(void);
+uint8_t is_ims_enabled(void);
+uint8_t is_ims_vt_support_enabled(void);
+uint8_t is_ims_rtp_support_enabled(void);
+uint8_t is_ims_sms_support_enabled(void);
 
 #endif

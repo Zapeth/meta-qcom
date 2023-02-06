@@ -11,6 +11,7 @@
 #include "openqti.h"
 #include "sms.h"
 #include "tracking.h"
+#include "config.h"
 
 #include <errno.h>
 #include <fcntl.h>

@@ -36,7 +36,6 @@
 void cmd_get_running_config() {
   size_t strsz = 0;
   uint8_t reply[MAX_MESSAGE_SIZE];
-  struct pkt_stats packet_stats;
   /* System: */
   memset(reply, 0, MAX_MESSAGE_SIZE);
   strsz = snprintf((char *)reply, MAX_MESSAGE_SIZE,
@@ -193,7 +192,7 @@ int cmd_get_uptime() {
   int bytes_written = 0;
   time(&current_secs);
   current_time = localtime(&current_secs);
-  uint8_t output[160];
+  uint8_t output[MAX_MESSAGE_SIZE];
 
   sysinfo(&info);
 
@@ -599,6 +598,7 @@ void cmd_dump_signal_report() {
       snprintf((char *)reply + strsz, MAX_MESSAGE_SIZE - strsz, "Verified? %s",
                report.opencellid_verified == 1 ? "Yes" : "No");
   add_message_to_queue(reply, strsz);
+  free(reply);
 }
 
 void *cmd_delayed_shutdown() {
@@ -692,9 +692,9 @@ void cmd_schedule_reminder(uint8_t *command) {
   uint8_t *offset_command;
   uint8_t *reply = calloc(MAX_MESSAGE_SIZE, sizeof(uint8_t));
   int strsz = 0;
-  char temp_str[160];
-  char reminder_text[160] = {0};
-  char current_word[160] = {0};
+  char temp_str[MAX_MESSAGE_SIZE];
+  char reminder_text[MAX_MESSAGE_SIZE] = {0};
+  char current_word[MAX_MESSAGE_SIZE] = {0};
   int markers[128] = {0};
   int phrase_size = 1;
   int start = 0;
@@ -742,7 +742,7 @@ void cmd_schedule_reminder(uint8_t *command) {
       start++;
     }
     // Copy this token
-    memset(current_word, 0, 160);
+    memset(current_word, 0, MAX_MESSAGE_SIZE);
     memcpy(current_word, temp_str + start, (end - start));
     // current_word[strlen(current_word)] = '\0';
 
@@ -897,8 +897,8 @@ void cmd_schedule_wakeup(uint8_t *command) {
   uint8_t *offset_command;
   uint8_t *reply = calloc(MAX_MESSAGE_SIZE, sizeof(uint8_t));
   int strsz = 0;
-  char temp_str[160];
-  char current_word[160] = {0};
+  char temp_str[MAX_MESSAGE_SIZE];
+  char current_word[MAX_MESSAGE_SIZE] = {0};
   int markers[128] = {0};
   int phrase_size = 1;
   int start = 0;
@@ -946,7 +946,7 @@ void cmd_schedule_wakeup(uint8_t *command) {
       start++;
     }
     // Copy this token
-    memset(current_word, 0, 160);
+    memset(current_word, 0, MAX_MESSAGE_SIZE);
     memcpy(current_word, temp_str + start, (end - start));
     // current_word[strlen(current_word)] = '\0';
 
@@ -1131,8 +1131,8 @@ void cmd_suspend_call_notifications(uint8_t *command) {
   uint8_t *offset_command;
   uint8_t *reply = calloc(MAX_MESSAGE_SIZE, sizeof(uint8_t));
   int strsz = 0;
-  char temp_str[160];
-  char current_word[160] = {0};
+  char temp_str[MAX_MESSAGE_SIZE];
+  char current_word[MAX_MESSAGE_SIZE] = {0};
   int markers[128] = {0};
   int phrase_size = 1;
   int start = 0;
@@ -1180,7 +1180,7 @@ void cmd_suspend_call_notifications(uint8_t *command) {
       start++;
     }
     // Copy this token
-    memset(current_word, 0, 160);
+    memset(current_word, 0, MAX_MESSAGE_SIZE);
     memcpy(current_word, temp_str + start, (end - start));
     // current_word[strlen(current_word)] = '\0';
 
@@ -1670,7 +1670,7 @@ void cmd_thank_you() {
   fp = fopen("/usr/share/thank_you/thankyou.txt", "r");
   if (fp != NULL) {
     size_t len = 0;
-    char *line;
+    char *line = NULL;
     memset(reply, 0, MAX_MESSAGE_SIZE);
     strsz = 0;
     uint16_t i = 0;

@@ -1174,7 +1174,7 @@ int build_and_send_raw_message(int fd, uint32_t message_id) {
  *  This func does the entire transaction
  */
 int handle_message_state(int fd, uint32_t message_id) {
-  if (message_id > QUEUE_SIZE) {
+  if (message_id >= QUEUE_SIZE) {
     logger(MSG_ERROR, "%s: Attempting to read invalid message ID: %i\n",
            __func__, message_id);
     return 0;
@@ -1666,7 +1666,7 @@ int check_wms_indication_message(void *bytes, size_t len, int adspfd,
         get_transceiver_suspend_state()) {
       logger(MSG_INFO, "%s: Attempting to wake up the host", __func__);
       pulse_ring_in(); // try to wake the host
-      sleep(3);        // sleep for 5s
+      sleep(3);        // sleep for 3s
       // Enqueue an incoming notification
       set_pending_notification_source(MSG_EXTERNAL);
       set_notif_pending(true);
