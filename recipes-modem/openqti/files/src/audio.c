@@ -189,12 +189,8 @@ void *play_alerting_tone() {
 
     if (set_params(pcm0, PCM_OUT)) {
       logger(MSG_ERROR, "Error setting TX Params\n");
+      fclose(file);
       pcm_close(pcm0);
-      return NULL;
-    }
-
-    if (!pcm0) {
-      logger(MSG_ERROR, "%s: Unable to open PCM device\n", __func__);
       return NULL;
     }
 
@@ -203,7 +199,8 @@ void *play_alerting_tone() {
 
     if (!buffer) {
       logger(MSG_ERROR, "Unable to allocate %d bytes\n", size);
-      free(buffer);
+      fclose(file);
+      pcm_close(pcm0);
       return NULL;
     }
 
@@ -307,6 +304,7 @@ void *incall_recording_tread() {
   if (audio_runtime_state.is_recording) {
     logger(MSG_ERROR, "%s: Can't start recording thread, already recording!\n",
            __func__);
+    free(sms_message);
     return NULL;
   }
 
@@ -328,6 +326,7 @@ void *incall_recording_tread() {
   if (incall_pcm_rx == NULL) {
     logger(MSG_INFO, "%s: Error opening %s (rx), bailing out\n", __func__,
            PCM_DEV_HIFI);
+    free(sms_message);
     return NULL;
   }
   incall_pcm_rx->channels = 1;
@@ -338,6 +337,7 @@ void *incall_recording_tread() {
   if (set_params(incall_pcm_rx, PCM_IN)) {
     logger(MSG_ERROR, "Error setting RX Params\n");
     pcm_close(incall_pcm_rx);
+    free(sms_message);
     return NULL;
   }
   populate_filename(1, filename_alt, 256);
@@ -374,10 +374,12 @@ void *incall_recording_tread() {
   /*
    * Ensure we loop the file while alerting
    */
-  while (audio_runtime_state.current_call_state != CALL_STATUS_IDLE) {
+  if (audio_runtime_state.current_call_state != CALL_STATUS_IDLE) {
     logger(MSG_INFO, "%s: Call recording started: %s\n", __func__, filename);
     if (file_rx == NULL) {
       pcm_close(incall_pcm_rx);
+      free(file_header);
+      free(sms_message);
       logger(MSG_ERROR, "%s: Error opening files for writing\n", __func__);
       audio_runtime_state.is_recording = 0; // Clear recording flag
       audio_runtime_state.record_next_call = 0;
@@ -395,6 +397,8 @@ void *incall_recording_tread() {
       audio_runtime_state.record_next_call = 0;
       fclose(file_rx);
       pcm_close(incall_pcm_rx);
+      free(file_header);
+      free(sms_message);
       return NULL;
     }
 
@@ -854,11 +858,18 @@ int start_audio(int type) {
   }
 
   pcm_rx = pcm_open((PCM_IN | PCM_MONO | PCM_MMAP), pcm_device);
+  if (!pcm_rx) {
+    return 0;
+  }
   pcm_rx->channels = 1;
   pcm_rx->flags = PCM_IN | PCM_MONO;
   pcm_rx->format = PCM_FORMAT_S16_LE;
 
   pcm_tx = pcm_open((PCM_OUT | PCM_MONO | PCM_MMAP), pcm_device);
+  if (!pcm_tx) {
+    pcm_close(pcm_rx);
+    return 0;
+  }
   pcm_tx->channels = 1;
   pcm_tx->flags = PCM_OUT | PCM_MONO;
   pcm_tx->format = PCM_FORMAT_S16_LE;
@@ -880,36 +891,43 @@ int start_audio(int type) {
   if (set_params(pcm_rx, PCM_IN)) {
     logger(MSG_ERROR, "Error setting RX Params\n");
     pcm_close(pcm_rx);
+    pcm_close(pcm_tx);
     return -EINVAL;
   }
 
   if (set_params(pcm_tx, PCM_OUT)) {
     logger(MSG_ERROR, "Error setting TX Params\n");
     pcm_close(pcm_tx);
+    pcm_close(pcm_rx);
     return -EINVAL;
   }
 
   if (ioctl(pcm_rx->fd, SNDRV_PCM_IOCTL_PREPARE)) {
     logger(MSG_ERROR, "Error getting RX PCM ready\n");
     pcm_close(pcm_rx);
+    pcm_close(pcm_tx);
     return -EINVAL;
   }
 
   if (ioctl(pcm_tx->fd, SNDRV_PCM_IOCTL_PREPARE)) {
     logger(MSG_ERROR, "Error getting TX PCM ready\n");
     pcm_close(pcm_tx);
+    pcm_close(pcm_rx);
     return -EINVAL;
   }
 
   if (ioctl(pcm_tx->fd, SNDRV_PCM_IOCTL_START) < 0) {
     logger(MSG_ERROR, "PCM ioctl start failed for TX\n");
     pcm_close(pcm_tx);
+    pcm_close(pcm_rx);
     return -EINVAL;
   }
 
   if (ioctl(pcm_rx->fd, SNDRV_PCM_IOCTL_START) < 0) {
     logger(MSG_ERROR, "PCM ioctl start failed for RX\n");
     pcm_close(pcm_rx);
+    pcm_close(pcm_tx);
+    return -EINVAL;
   }
 
   if (type == CALL_STATUS_CS || type == CALL_STATUS_VOLTE) {

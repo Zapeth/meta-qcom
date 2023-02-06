@@ -42,7 +42,7 @@ void *thermal_monitoring_thread() {
   int prev_sensor_reading[7] = {0};
   char sensor_path[128];
   int i;
-  uint8_t *reply = calloc(160, sizeof(unsigned char));
+  uint8_t *reply = calloc(MAX_MESSAGE_SIZE, sizeof(unsigned char));
   int msglen;
   bool notified_emergency = false;
   bool notified_warning = false;
@@ -121,6 +121,7 @@ void *thermal_monitoring_thread() {
       round = 0;
     }
   }
+  free(reply);
 
   return 0;
 }

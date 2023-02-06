@@ -386,7 +386,7 @@ void *simulated_call_tts_handler() {
   int size;
   int num_read;
   FILE *file;
-  struct pcm *pcm0;
+  struct pcm *pcm0 = NULL;
   int i;
   bool handled;
   char *phrase; //[MAX_TTS_TEXT_SIZE];
@@ -418,11 +418,6 @@ void *simulated_call_tts_handler() {
     if (set_params(pcm0, PCM_OUT)) {
       logger(MSG_ERROR, "Error setting TX Params\n");
       pcm_close(pcm0);
-      return NULL;
-    }
-
-    if (!pcm0) {
-      logger(MSG_ERROR, "%s: Unable to open PCM device\n", __func__);
       return NULL;
     }
   }
@@ -465,8 +460,8 @@ void *simulated_call_tts_handler() {
 
     if (!buffer) {
       logger(MSG_ERROR, "Unable to allocate %d bytes\n", size);
-      free(buffer);
-      buffer = NULL;
+      fclose(file);
+      pcm_close(pcm0);
       return NULL;
     }
 
@@ -481,12 +476,10 @@ void *simulated_call_tts_handler() {
       }
     } while (num_read > 0 && get_call_simulation_mode());
     fclose(file);
+    free(buffer);
   }
 
   logger(MSG_INFO, "%s: Cleaning up\n", __func__);
-
-  free(buffer);
-  buffer = NULL;
   pcm_close(pcm0);
 
   stop_multimedia_mixer();

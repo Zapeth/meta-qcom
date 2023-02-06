@@ -188,7 +188,7 @@ void cleanup_tasks() {
 
 int run_task(int taskID) {
   logger(MSG_INFO, "%s: Running task %i\n", __func__, taskID);
-  if (taskID < 0 || taskID > MAX_NUM_TASKS) {
+  if (taskID < 0 || taskID >= MAX_NUM_TASKS) {
     logger(MSG_ERROR, "%s: Invalid task\n", __func__);
     return -EINVAL;
   }
@@ -221,19 +221,22 @@ int run_task(int taskID) {
   case TASK_TYPE_WAKE_HOST:
     logger(MSG_INFO, "%s: Try to wake up the host\n", __func__);
     pulse_ring_in();
+    sch_runtime.tasks[taskID].status = STATUS_DONE;
     break;
   case TASK_TYPE_DND_CLEAR:
     logger(MSG_INFO, "%s: Clear do not disturb mode\n", __func__);
     set_do_not_disturb(false);
+    sch_runtime.tasks[taskID].status = STATUS_DONE;
     break;
   }
+
   cleanup_tasks();
   return 0;
 }
 
 void *start_scheduler_thread() {
   int i;
-  sleep(120); // Wait 60 seconds to give time to modemmanager to connect...
+  sleep(120); // Wait 120 seconds to give time to modemmanager to connect...
   logger(MSG_INFO, "%s: Starting scheduler thread\n", __func__);
   read_tasks_from_storage();
   while (1) {

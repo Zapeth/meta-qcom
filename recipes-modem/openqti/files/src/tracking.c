@@ -68,7 +68,7 @@ int add_client(uint8_t service, uint8_t instance) {
 
 int remove_client(uint8_t service, uint8_t instance) {
   int i;
-  for (i = 32; i >= 0; i--) {
+  for (i = 31; i >= 0; i--) {
     if (client_tracking.services[i].service == service &&
         client_tracking.services[i].instance == instance) {
       client_tracking.services[i].service = 0;

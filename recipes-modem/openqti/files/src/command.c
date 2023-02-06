@@ -486,9 +486,9 @@ void schedule_reminder(uint8_t *command) {
   uint8_t *offset_command;
   uint8_t *reply = calloc(256, sizeof(unsigned char));
   int strsz = 0;
-  char temp_str[160];
-  char reminder_text[160] = {0};
-  char current_word[160] = {0};
+  char temp_str[MAX_MESSAGE_SIZE];
+  char reminder_text[MAX_MESSAGE_SIZE] = {0};
+  char current_word[MAX_MESSAGE_SIZE] = {0};
   int markers[128] = {0};
   int phrase_size = 1;
   int start = 0;
@@ -690,8 +690,8 @@ void schedule_wakeup(uint8_t *command) {
   uint8_t *offset_command;
   uint8_t *reply = calloc(256, sizeof(unsigned char));
   int strsz = 0;
-  char temp_str[160];
-  char current_word[160] = {0};
+  char temp_str[MAX_MESSAGE_SIZE];
+  char current_word[MAX_MESSAGE_SIZE] = {0};
   int markers[128] = {0};
   int phrase_size = 1;
   int start = 0;
@@ -923,8 +923,8 @@ void suspend_call_notifications(uint8_t *command) {
   uint8_t *offset_command;
   uint8_t *reply = calloc(256, sizeof(unsigned char));
   int strsz = 0;
-  char temp_str[160];
-  char current_word[160] = {0};
+  char temp_str[MAX_MESSAGE_SIZE];
+  char current_word[MAX_MESSAGE_SIZE] = {0};
   int markers[128] = {0};
   int phrase_size = 1;
   int start = 0;
@@ -1070,7 +1070,7 @@ void suspend_call_notifications(uint8_t *command) {
 
 void set_cb_broadcast(bool en) {
   char *response = malloc(128 * sizeof(char));
-  uint8_t *reply = calloc(160, sizeof(unsigned char));
+  uint8_t *reply = calloc(MAX_MESSAGE_SIZE, sizeof(unsigned char));
   int strsz;
   int cmd_ret;
   if (en) {
@@ -1110,7 +1110,7 @@ uint8_t parse_command(uint8_t *command) {
   int strsz = 0;
   struct pkt_stats packet_stats;
   pthread_t disposable_thread;
-  char lowercase_cmd[160];
+  char lowercase_cmd[MAX_MESSAGE_SIZE];
   uint8_t *tmpbuf = calloc(MAX_MESSAGE_SIZE, sizeof(unsigned char));
   uint8_t *reply = calloc(MAX_MESSAGE_SIZE, sizeof(unsigned char));
   srand(time(NULL));
@@ -1198,7 +1198,7 @@ uint8_t parse_command(uint8_t *command) {
                         "Memory stats:\n%s\n", tmpbuf);
     } else {
       strsz += snprintf((char *)reply + strsz, MAX_MESSAGE_SIZE - strsz,
-                        "Error getting laodavg\n");
+                        "Error getting loadavg\n");
     }
     add_message_to_queue(reply, strsz);
     break;
@@ -1288,7 +1288,7 @@ uint8_t parse_command(uint8_t *command) {
     break;
   case 13:
     for (i = 0; i < cmd_runtime.cmd_position; i++) {
-      if (strsz < 160) {
+      if (strsz < MAX_MESSAGE_SIZE) {
         strsz += snprintf((char *)reply + strsz, MAX_MESSAGE_SIZE - strsz,
                           "%i ", cmd_runtime.cmd_history[i]);
       }

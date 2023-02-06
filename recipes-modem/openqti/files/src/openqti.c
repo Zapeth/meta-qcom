@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
       return 0;
 
     case 'l':
-      fprintf(stdout, "Log everything (even passing packets)");
+      fprintf(stdout, "Log everything (even passing packets)\n");
       fprintf(stdout, "WARNING: Your logfile might contain sensitive data, "
                       "such as phone numbers or message contents\n\n");
       set_log_level(0);
@@ -139,10 +139,7 @@ int main(int argc, char **argv) {
   }
 
   /* Set cpu governor to performance to speed it up a bit */
-  if (write_to(CPUFREQ_PATH, CPUFREQ_PERF, O_WRONLY) < 0) {
-    logger(MSG_ERROR, "%s: Error setting up governor in performance mode\n",
-           __func__);
-  }
+  enable_cpufreq_performance_mode(true);
 
   do {
     logger(MSG_DEBUG, "%s: Waiting for ADSP init...\n", __func__);
@@ -276,10 +273,7 @@ int main(int argc, char **argv) {
 */
 
   logger(MSG_INFO, "%s: Switching to powersave mode\n", __func__);
-  if (write_to(CPUFREQ_PATH, CPUFREQ_PS, O_WRONLY) < 0) {
-    logger(MSG_ERROR, "%s: Error setting up governor in powersave mode\n",
-           __func__);
-  }
+  enable_cpufreq_performance_mode(false);
 
   /* just in case we previously died... */
   enable_usb_port();

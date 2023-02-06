@@ -76,6 +76,7 @@ int find_services() {
     fd = socket(IPC_ROUTER, SOCK_DGRAM, 0);
     if (fd < 0) {
       fprintf(stdout, "Error opening socket\n");
+      free(lookup);
       return -EINVAL;
     }
     lookup->port_name.service = k;
@@ -128,7 +129,7 @@ struct msm_ipc_server_info get_node_port(uint32_t service, uint32_t instance) {
   struct server_lookup_args *lookup;
 
   int sock;
-  struct msm_ipc_server_info port_combo;
+  struct msm_ipc_server_info port_combo = {0};
 
   port_combo.node_id = 0;
   port_combo.port_id = 0;
@@ -178,6 +179,7 @@ int setup_ipc_security() {
   fd = socket(IPC_ROUTER, SOCK_DGRAM, 0);
   if (!fd) {
     logger(MSG_ERROR, " Error opening socket \n");
+    free(cur_rule);
     return -1;
   }
   for (i = 0; i < ipc_categories; i++) {
@@ -186,7 +188,7 @@ int setup_ipc_security() {
     cur_rule->instance = IRSC_INSTANCE_ALL; // all instances
     cur_rule->group_id[0] = 54;
     if (ioctl(fd, IOCTL_RULES, cur_rule) < 0) {
-      logger(MSG_ERROR, "%s: Error serring rule %i \n", __func__, i);
+      logger(MSG_ERROR, "%s: Error setting rule %i \n", __func__, i);
       ret = 2;
       break;
     }
@@ -218,6 +220,8 @@ int init_port_mapper_internal() {
                         0x1, IPC_ROUTER_DPM_ADDRTYPE); // open DPM service
   if (ret < 0) {
     logger(MSG_ERROR, "%s: Error opening IPC Socket!\n", __func__);
+    free(qmidev);
+    free(dpmreq);
     return -EINVAL;
   }
 
@@ -228,6 +232,9 @@ int init_port_mapper_internal() {
   dpmfd = open(DPM_CTL, O_RDWR);
   if (dpmfd < 0) {
     logger(MSG_ERROR, "Error opening %s \n", DPM_CTL);
+    close(qmidev->fd);
+    free(qmidev);
+    free(dpmreq);
     return -EINVAL;
   }
   // Unknown IOCTL, just before line state to rmnet
@@ -259,7 +266,7 @@ int init_port_mapper_internal() {
   dpmreq->sw.id = 0x11;
   dpmreq->sw.len = 0x0011;
   dpmreq->sw.valid_ctl_list = 1;
-  dpmreq->sw.ep_type = htole32(5);
+  dpmreq->sw.ep_type = htole32(DATA_EP_TYPE_BAM_DMUX);
   dpmreq->sw.peripheral_id = htole32(0);
   dpmreq->sw.consumer_pipe_num = htole32(0);
   dpmreq->sw.prod_pipe_num = htole32(0);
@@ -303,6 +310,8 @@ int init_port_mapper() {
                         0x1, IPC_ROUTER_DPM_ADDRTYPE); // open DPM service
   if (ret < 0) {
     logger(MSG_ERROR, "%s: Error opening IPC Socket!\n", __func__);
+    free(qmidev);
+    free(dpmreq);
     return -EINVAL;
   }
 
@@ -313,6 +322,9 @@ int init_port_mapper() {
   dpmfd = open(DPM_CTL, O_RDWR);
   if (dpmfd < 0) {
     logger(MSG_ERROR, "Error opening %s \n", DPM_CTL);
+    close(qmidev->fd);
+    free(qmidev);
+    free(dpmreq);
     return -EINVAL;
   }
   // Unknown IOCTL, just before line state to rmnet
@@ -343,7 +355,7 @@ int init_port_mapper() {
   dpmreq->sw.id = 0x11;
   dpmreq->sw.len = 0x0011;
   dpmreq->sw.valid_ctl_list = 1;
-  dpmreq->sw.ep_type = htole32(5);
+  dpmreq->sw.ep_type = htole32(DATA_EP_TYPE_BAM_DMUX);
   dpmreq->sw.peripheral_id = htole32(8);
   dpmreq->sw.consumer_pipe_num = htole32(1);
   dpmreq->sw.prod_pipe_num = htole32(1);
