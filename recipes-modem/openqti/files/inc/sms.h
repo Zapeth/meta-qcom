@@ -695,27 +695,27 @@ struct message_data {
   char phone_number[64];
   uint8_t dcs;
   bool raw_message;
-  char message[160];
+  char message[MAX_MESSAGE_SIZE];
 };
 
 /* END OF PDU_DECODE */
 
 /* Functions */
-void reset_sms_runtime();
+void reset_sms_runtime(void);
 void set_notif_pending(bool en);
 void set_queue_lock(bool lock);
 void set_pending_notification_source(uint8_t source);
 
 
 
-uint8_t get_notification_source();
+uint8_t get_notification_source(void);
 void set_pending_messages_in_adsp(uint32_t index);
-uint32_t get_pending_messages_in_adsp();
-bool is_stuck_message_retrieve_pending();
+uint32_t get_pending_messages_in_adsp(void);
+bool is_stuck_message_retrieve_pending(void);
 
-uint32_t get_internal_pending_messages();
+uint32_t get_internal_pending_messages(void);
 
-bool is_message_pending();
+bool is_message_pending(void);
 uint8_t generate_message_notification(int fd, uint32_t message_id);
 uint8_t ack_message_notification(int fd, uint8_t pending_message_num);
 uint8_t inject_message(uint8_t message_id);
@@ -735,5 +735,4 @@ int check_wms_indication_message(void *bytes, size_t len, int adspfd,
 int check_cb_message(void *bytes, size_t len, int adspfd, int usbfd);
 
 int retrieve_and_delete(int adspfd, int usbfd);
-void send_hello_world();
-#endif
+#endifvoid send_hello_world(void);

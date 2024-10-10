@@ -50,6 +50,4 @@ struct node_pair {
   bool allow_exit;
 };
 
-int start_audio(int type);
-int stop_audio();
 #endif

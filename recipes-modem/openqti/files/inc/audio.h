@@ -207,11 +207,11 @@ struct wav_header {
     // uint8_t bytes[]; // Remainder of wave file is bytes
 } __attribute__((packed));
 
-void set_audio_runtime_default();
-uint8_t get_current_call_id();
-int use_external_codec();
+void set_audio_runtime_default(void);
+uint8_t get_current_call_id(void);
+int use_external_codec(void);
 void set_output_device(int device);
-uint8_t get_output_device();
+uint8_t get_output_device(void);
 void set_audio_mute(bool mute);
 /* Mixer functions */
 struct mixer *mixer_open(const char *device);
@@ -231,24 +231,23 @@ int set_params(struct pcm *pcm, int path);
 /* OpenQTI audio setting helpers */
 int set_mixer_ctl(struct mixer *mixer, char *name, int value);
 int mixer_ctl_set_gain(struct mixer_ctl *ctl, int call_type, int value);
-int stop_audio();
+int stop_audio(void);
 int start_audio(int type);
 void handle_call_pkt(uint8_t *pkt, int sz, uint8_t phone_number[MAX_PHONE_NUMBER_LENGTH], size_t phone_num_len);
-int set_audio_defaults();
-int set_external_codec_defaults();
-void set_auxpcm_sampling_rate(uint8_t mode);
+int set_audio_defaults(void);
+int set_external_codec_defaults(void);
 int pcm_write(struct pcm *pcm, void *data, unsigned count);
 unsigned int pcm_get_buffer_size(const struct pcm *pcm);
 unsigned int pcm_frames_to_bytes(struct pcm *pcm, unsigned int frames);
 int pcm_read(struct pcm *pcm, void *data, uint32_t count);
-void setup_codec();
+void setup_codec(void);
 
 int pico2aud(char *text, size_t len);
-void set_multimedia_mixer();
-void stop_multimedia_mixer();
+void set_multimedia_mixer(void);
+void stop_multimedia_mixer(void);
 /* Recording */
 void record_next_call(bool en);
-int record_current_call();
+int record_current_call(void);
 unsigned int pcm_bytes_to_frames(const struct pcm *pcm, unsigned int bytes);
 
 #endif

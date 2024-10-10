@@ -50,7 +50,7 @@ uint8_t get_current_call_id() {
   return audio_runtime_state.current_active_call_id;
 }
 
-int use_external_codec() {
+int use_external_codec(void) {
   int fd;
   fd = open(EXTERNAL_CODEC_DETECT_PATH, O_RDONLY);
   if (fd < 0) {
@@ -126,7 +126,7 @@ void set_audio_mute(bool mute) {
   }
 }
 
-void set_multimedia_mixer() {
+void set_multimedia_mixer(void) {
   if (use_external_codec()) {
     set_mixer_ctl(mixer, AUX_PCM_MODE, 0);
     set_mixer_ctl(mixer, SEC_AUXPCM_MODE, 0);
@@ -140,12 +140,12 @@ void set_multimedia_mixer() {
   set_mixer_ctl(mixer, HIFI_TX_MULTIMEDIA_MIXER, 1);
 }
 
-void stop_multimedia_mixer() { 
+void stop_multimedia_mixer(void) {
   set_mixer_ctl(mixer, HIFI_RX_MULTIMEDIA_MIXER, 0); 
   set_mixer_ctl(mixer, HIFI_TX_MULTIMEDIA_MIXER, 0); 
   }
 
-void *play_alerting_tone() {
+void *play_alerting_tone(void) {
   char *buffer;
   int size;
   int num_read;
@@ -297,7 +297,7 @@ uint8_t watch_storage(char *filename) {
   }
   return kill_recording;
 }
-void *incall_recording_tread() {
+void *incall_recording_thread(void) {
   char *buffer;
   size_t bufsize;
   FILE *file_rx;
@@ -496,7 +496,7 @@ void record_next_call(bool en) {
     audio_runtime_state.record_next_call = 0;
 }
 
-int record_current_call() {
+int record_current_call(void) {
   int ret;
   pthread_t call_thread;
   logger(MSG_INFO, "%s: \n", __func__);
@@ -505,7 +505,7 @@ int record_current_call() {
   }
   audio_runtime_state.record_next_call = 1;
   if ((ret =
-           pthread_create(&call_thread, NULL, &incall_recording_tread, NULL))) {
+           pthread_create(&call_thread, NULL, &incall_recording_thread, NULL))) {
     logger(MSG_ERROR, "%s: Error creating call recording thread\n", __func__);
   }
 
@@ -621,7 +621,7 @@ void handle_call_pkt(uint8_t *pkt, int sz,
       /* REC PATCH IN*/
       if (audio_runtime_state.record_next_call ||
           is_automatic_call_recording_enabled() > 0) {
-        if ((ret = pthread_create(&tone_thread, NULL, &incall_recording_tread,
+        if ((ret = pthread_create(&tone_thread, NULL, &incall_recording_thread,
                                   NULL))) {
           logger(MSG_ERROR, "%s: Error creating call recording thread\n",
                  __func__);
@@ -717,7 +717,7 @@ int set_gain_ctl(struct mixer *mixer, char *name, int type, int value) {
 }
 
 /* Stop mixers and pcm for previously active audio */
-int stop_audio() {
+int stop_audio(void) {
 
   audio_runtime_state.current_active_call_id = 0;
   if (audio_runtime_state.current_call_state == CALL_STATUS_IDLE) {
@@ -944,7 +944,7 @@ int set_external_codec_defaults() {
   return 0;
 }
 
-void setup_codec() {
+void setup_codec(void) {
   mixer = mixer_open(SND_CTL);
   if (use_external_codec()) {
     set_auxpcm_sampling_rate(1); // Set audio mode to 16KPCM

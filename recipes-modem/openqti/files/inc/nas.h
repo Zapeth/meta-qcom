@@ -633,22 +633,22 @@ struct network_status_reports {
 };
 
 /* Functions */
-void notify_database_unavailable();
-uint8_t is_cellid_data_missing();
-void set_cellid_data_missing_as_requested();
-void get_opencellid_data();
-uint8_t *get_current_mcc();
-uint8_t *get_current_mnc();
-uint8_t get_network_type();
-struct nas_report get_current_cell_report();
-struct basic_network_status get_network_status();
-uint8_t get_signal_strength();
-uint8_t nas_is_network_in_service();
+void notify_database_unavailable(void);
+uint8_t is_cellid_data_missing(void);
+void set_cellid_data_missing_as_requested(void);
+void get_opencellid_data(void);
+uint8_t *get_current_mcc(void);
+uint8_t *get_current_mnc(void);
+uint8_t get_network_type(void);
+struct nas_report get_current_cell_report(void);
+struct basic_network_status get_network_status(void);
+uint8_t get_signal_strength(void);
+uint8_t nas_is_network_in_service(void);
 const char *get_nas_command(uint16_t msgid);
 
-int nas_request_cell_location_info();
-int nas_request_signal_info();
+int nas_request_cell_location_info(void);
+int nas_request_signal_info(void);
 
-void *register_to_nas_service();
+void *register_to_nas_service(void);
 int handle_incoming_nas_message(uint8_t *buf, size_t buf_len);
 #endif
