@@ -21,7 +21,7 @@
 #define BOOT_FLAG_FILE "/persist/.openqti_boot_done"
 struct config_prototype *settings;
 
-int set_persistent_partition_rw() {
+int set_persistent_partition_rw(void) {
   if (system("mount -o remount,rw /persist") < 0) {
     logger(MSG_ERROR, "%s: Error setting partition in RW mode\n", __func__);
     return -1;
@@ -29,7 +29,7 @@ int set_persistent_partition_rw() {
   return 0;
 }
 
-int set_persistent_partition_ro() {
+int set_persistent_partition_ro(void) {
   if (system("mount -o remount,ro /persist") < 0) {
     logger(MSG_ERROR, "%s: Error setting partition in RO mode\n", __func__);
     return -1;
@@ -38,12 +38,12 @@ int set_persistent_partition_ro() {
   return 0;
 }
 
-void do_sync_fs() {
+void do_sync_fs(void) {
   if (system("sync") < 0)
     logger(MSG_ERROR, "%s: Failed to sync fs\n", __func__);
 }
 
-int set_initial_config() {
+int set_initial_config(void) {
   settings = malloc(sizeof(struct config_prototype));
   settings->custom_alert_tone = 0;
   settings->persistent_logging = 0;
@@ -308,7 +308,7 @@ int write_boot_counter_file(int failed_boots) {
   return 0;
 }
 
-int read_boot_counter_file() {
+int read_boot_counter_file(void) {
   FILE *fp;
   int val = 0;
   logger(MSG_DEBUG, "%s: Read boot counter\n", __func__);
@@ -328,7 +328,7 @@ int read_boot_counter_file() {
   return val;
 }
 
-int read_settings_from_file() {
+int read_settings_from_file(void) {
   FILE *fp;
   char buf[1024];
   int line = 0;
@@ -370,46 +370,46 @@ int read_settings_from_file() {
   return 0;
 }
 
-bool is_first_boot() { return settings->first_boot; }
+bool is_first_boot(void) { return settings->first_boot; }
 
-void clear_ifrst_boot_flag() { settings->first_boot = false; }
+void clear_ifrst_boot_flag(void) { settings->first_boot = false; }
 
-uint8_t use_persistent_logging() { return settings->persistent_logging; }
+uint8_t use_persistent_logging(void) { return settings->persistent_logging; }
 
-char *get_openqti_logfile() {
+char *get_openqti_logfile(void) {
   if (settings->persistent_logging)
     return PERSISTENT_LOGPATH;
 
   return VOLATILE_LOGPATH;
 }
 
-char *get_default_logpath() {
+char *get_default_logpath(void) {
   if (settings->persistent_logging)
     return PERSISTENT_PATH;
 
   return VOLATILE_PATH;
 }
-uint8_t use_custom_alert_tone() { return settings->custom_alert_tone; }
+uint8_t use_custom_alert_tone(void) { return settings->custom_alert_tone; }
 
-uint8_t is_signal_tracking_enabled() { return settings->signal_tracking; }
+uint8_t is_signal_tracking_enabled(void) { return settings->signal_tracking; }
 
-uint8_t get_signal_tracking_mode() { return settings->signal_tracking_mode; }
+uint8_t get_signal_tracking_mode(void) { return settings->signal_tracking_mode; }
 
-uint8_t get_dump_network_tables_config() { return settings->dump_network_tables; }
+uint8_t get_dump_network_tables_config(void) { return settings->dump_network_tables; }
 
-uint8_t is_sms_logging_enabled() { return settings->sms_logging; }
+uint8_t is_sms_logging_enabled(void) { return settings->sms_logging; }
 
-uint8_t is_sms_list_all_bypass_enabled() { return settings->list_all_bypass; }
+uint8_t is_sms_list_all_bypass_enabled(void) { return settings->list_all_bypass; }
 
-uint8_t is_internal_connect_enabled() {
+uint8_t is_internal_connect_enabled(void) {
   return settings->allow_internal_modem_connectivity;
 }
 
-uint8_t is_automatic_call_recording_enabled() {
+uint8_t is_automatic_call_recording_enabled(void) {
   return settings->automatic_call_recording;
 }
 
-uint8_t callwait_auto_hangup_operation_mode() {
+uint8_t callwait_auto_hangup_operation_mode(void) {
   return settings->callwait_autohangup;
 }
 
@@ -423,9 +423,9 @@ uint8_t get_user_name(char *buff) {
   return 1;
 }
 
-char *get_rt_modem_name() { return settings->modem_name; }
+char *get_rt_modem_name(void) { return settings->modem_name; }
 
-char *get_rt_user_name() { return settings->user_name; }
+char *get_rt_user_name(void) { return settings->user_name; }
 
 void set_custom_alert_tone(bool en) {
   if (en) {
@@ -568,10 +568,10 @@ void set_signal_tracking_mode(uint8_t mode) {
   write_settings_to_storage();
 }
 
-uint8_t is_signal_tracking_downgrade_notification_enabled() {
+uint8_t is_signal_tracking_downgrade_notification_enabled(void) {
   return settings->signal_tracking_notify_downgrade;
 }
-uint8_t get_signal_tracking_cell_change_notification_mode() {
+uint8_t get_signal_tracking_cell_change_notification_mode(void) {
   return settings->signal_tracking_notify_cell_change;
 }
 
@@ -628,7 +628,7 @@ void enable_call_waiting_autohangup(uint8_t en) {
   write_settings_to_storage();
 }
 
-char *get_signal_tracking_mode_text() {
+char *get_signal_tracking_mode_text(void) {
   if (settings->signal_tracking_mode == 0) {
     return "Standalone/Learn";
   } else if (settings->signal_tracking_mode == 1) {
@@ -641,7 +641,7 @@ char *get_signal_tracking_mode_text() {
   return "unknown";
 }
 
-char *get_signal_tracking_cell_change_notification_mode_text() {
+char *get_signal_tracking_cell_change_notification_mode_text(void) {
   if (settings->signal_tracking_notify_cell_change == 0) {
     return "none";
   } else if (settings->signal_tracking_notify_cell_change == 1) {
@@ -652,18 +652,18 @@ char *get_signal_tracking_cell_change_notification_mode_text() {
   return "unknown";
 }
 
-char *get_internal_network_apn_name() {
+char *get_internal_network_apn_name(void) {
   return settings->apn_addr;
 }
 
-char *get_internal_network_username() {
+char *get_internal_network_username(void) {
   return settings->apn_username;
 }
 
-char *get_internal_network_pass() {
+char *get_internal_network_pass(void) {
   return settings->apn_password;
 }
-char *get_internal_network_auth_method_text() {
+char *get_internal_network_auth_method_text(void) {
   if (settings->apn_auth_method == 0) {
     return "none";
   } else if (settings->apn_auth_method == 1) {
@@ -676,7 +676,7 @@ char *get_internal_network_auth_method_text() {
   return "unknown";
 }
 
-uint8_t get_internal_network_auth_method() {
+uint8_t get_internal_network_auth_method(void) {
   return settings->apn_auth_method;
 }
 
@@ -709,19 +709,19 @@ void set_internal_network_auth_method(uint8_t method) {
 }
 
 /* IMSG Getters */
-char *get_ims_network_apn_name() {
+char *get_ims_network_apn_name(void) {
   return settings->ims_apn_addr;
 }
 
-char *get_ims_network_username() {
+char *get_ims_network_username(void) {
   return settings->ims_apn_username;
 }
 
-char *get_ims_network_pass() {
+char *get_ims_network_pass(void) {
   return settings->ims_apn_password;
 }
 
-uint8_t is_ims_enabled() { return settings->ims_attempt_enable; }
-uint8_t is_ims_vt_support_enabled() { return settings->ims_vt_support; }
-uint8_t is_ims_rtp_support_enabled() { return settings->ims_rtp_support; }
-uint8_t is_ims_sms_support_enabled() { return settings->ims_sms_support; }
+uint8_t is_ims_enabled(void) { return settings->ims_attempt_enable; }
+uint8_t is_ims_vt_support_enabled(void) { return settings->ims_vt_support; }
+uint8_t is_ims_rtp_support_enabled(void) { return settings->ims_rtp_support; }
+uint8_t is_ims_sms_support_enabled(void) { return settings->ims_sms_support; }

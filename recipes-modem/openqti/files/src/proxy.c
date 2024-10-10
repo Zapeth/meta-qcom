@@ -145,7 +145,7 @@ void *gps_proxy() {
     }
 
     FD_SET(nodes->node1.fd, &readfds);
-    if (nodes->node2.fd > 0) {
+    if (nodes->node2.fd >= 0) {
       FD_SET(nodes->node2.fd, &readfds);
     }
 
@@ -199,6 +199,7 @@ void *gps_proxy() {
       }
     }
   }
+  free(nodes);
 }
 
 uint8_t process_simulated_packet(uint8_t source, int adspfd, int usbfd) {

@@ -93,13 +93,13 @@ void set_pending_notification_source(uint8_t source) {
   sms_runtime.source = source;
 }
 
-uint8_t get_notification_source() { return sms_runtime.source; }
+uint8_t get_notification_source(void) { return sms_runtime.source; }
 
-uint32_t get_pending_messages_in_adsp() {
+uint32_t get_pending_messages_in_adsp(void) {
   return sms_runtime.pending_messages_from_adsp;
 }
 
-bool is_stuck_message_retrieve_pending() {
+bool is_stuck_message_retrieve_pending(void) {
   return sms_runtime.stuck_message_data_pending;
 }
 
@@ -114,11 +114,11 @@ void set_pending_messages_in_adsp(uint32_t index) {
   sms_runtime.pending_messages_from_adsp = index;
 }
 
-uint32_t get_internal_pending_messages() {
+uint32_t get_internal_pending_messages(void) {
   return sms_runtime.current_message_id;
 }
 
-bool is_message_pending() { return sms_runtime.notif_pending; }
+bool is_message_pending(void) { return sms_runtime.notif_pending; }
 
 /* 2022-12-20 | Migrating to modemmanager code */
 int gsm7_to_ascii(const unsigned char *buffer, int buffer_length,
@@ -640,7 +640,7 @@ int pdu_decode(uint8_t *buffer, size_t size, struct message_data *msg_out, uint8
 
     switch (user_data_encoding) {
     case MM_SMS_ENCODING_GSM7: {
-      char text[160] = {0};
+      char text[MAX_MESSAGE_SIZE] = {0};
 
       /* Otherwise if it's 7-bit or UCS2 we can decode it */
       logger(MSG_PDU_DECODE,
@@ -650,7 +650,7 @@ int pdu_decode(uint8_t *buffer, size_t size, struct message_data *msg_out, uint8
                     tp_user_data_size_elements, text, tp_user_data_size_bytes,
                     bit_offset);
       logger(MSG_PDU_DECODE, "Decoded string: %s\n", text);
-      strncpy(msg_out->message, text, 160);
+      strncpy(msg_out->message, text, MAX_MESSAGE_SIZE);
       msg_out->raw_message = false;
       break;
     }
@@ -662,8 +662,8 @@ int pdu_decode(uint8_t *buffer, size_t size, struct message_data *msg_out, uint8
              "%s: Not converting message contents, passing it raw (encoding: "
              "%.2x)\n",
              __func__, user_data_encoding);
-      uint8_t raw_data[160];
-      if (tp_user_data_size_bytes > 160) {
+      uint8_t raw_data[MAX_MESSAGE_SIZE];
+      if (tp_user_data_size_bytes > MAX_MESSAGE_SIZE) {
         logger(MSG_ERROR, "ERROR: Size exceeds what fits in a SMS\n");
       } else {
         memcpy(raw_data, msg->msg.data + tp_user_data_offset,
@@ -754,6 +754,7 @@ int decode_phone_number(uint8_t *buffer, int len, char *out) {
     }
     i++;
   }
+  // TODO: check len<sizeof(output)?
   output[len] = '\0';
   if (is_international) {
     snprintf(out, 128, "+%s", output);
@@ -876,14 +877,14 @@ int build_and_send_message(int fd, uint32_t message_id) {
 
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
-  uint8_t msgoutput[160] = {0};
+  uint8_t msgoutput[MAX_MESSAGE_SIZE] = {0};
   ret = ascii_to_gsm7((uint8_t *)sms_runtime.queue.msg[message_id].pkt,
                       msgoutput);
 
   logger(MSG_DEBUG, "%s: Message ID: %u | Str: %s | %i bytes\n", __func__, message_id, sms_runtime.queue.msg[message_id].pkt, ret);
   if (ret > MAX_MESSAGE_SIZE) {
     logger(MSG_ERROR, "%s: Warning: resulting message size exceeds limit. Truncating\n");
-    ret = 160;
+    ret = MAX_MESSAGE_SIZE;
   }
   /* QMUX */
   this_sms->qmuxpkt.version = 0x01;
@@ -1174,7 +1175,7 @@ int build_and_send_raw_message(int fd, uint32_t message_id) {
  *  This func does the entire transaction
  */
 int handle_message_state(int fd, uint32_t message_id) {
-  if (message_id > QUEUE_SIZE) {
+  if (message_id >= QUEUE_SIZE) {
     logger(MSG_ERROR, "%s: Attempting to read invalid message ID: %i\n",
            __func__, message_id);
     return 0;
@@ -1245,7 +1246,7 @@ int handle_message_state(int fd, uint32_t message_id) {
   }
   return 0;
 }
-void wipe_queue() {
+void wipe_queue(void) {
   logger(MSG_DEBUG, "%s: Wipe status. \n", __func__);
   for (int i = 0; i <= sms_runtime.queue.queue_pos; i++) {
     sms_runtime.queue.msg[i].state = 0;
@@ -1666,7 +1667,7 @@ int check_wms_indication_message(void *bytes, size_t len, int adspfd,
         get_transceiver_suspend_state()) {
       logger(MSG_INFO, "%s: Attempting to wake up the host", __func__);
       pulse_ring_in(); // try to wake the host
-      sleep(3);        // sleep for 5s
+      sleep(3);        // sleep for 3s
       // Enqueue an incoming notification
       set_pending_notification_source(MSG_EXTERNAL);
       set_notif_pending(true);
@@ -1724,7 +1725,7 @@ READ MESSAGE REQ
 int parse_and_forward_adsp_message(void *bytes, size_t len) {
   struct message_data *msg_out =
       malloc(sizeof(struct message_data)); // 2022-12-20
-  uint8_t *message = malloc(160 * sizeof(uint8_t));
+  uint8_t *message = malloc(MAX_MESSAGE_SIZE * sizeof(uint8_t));
   uint8_t dcs = 0;
   int sztmp;
   struct raw_sms *msg = (struct raw_sms *)bytes;
@@ -1751,16 +1752,16 @@ int parse_and_forward_adsp_message(void *bytes, size_t len) {
     return -EINVAL;
   } else {
     logger(MSG_INFO, "Regenerate stuck message and send it!\n");
-    sztmp = snprintf((char *)message, 160, "Stuck message from %s:\n--------\n",
+    sztmp = snprintf((char *)message, MAX_MESSAGE_SIZE, "Stuck message from %s:\n--------\n",
                      msg_out->phone_number);
     add_sms_to_queue((uint8_t *)message, sztmp);
-    memset(message, 0, 160);
+    memset(message, 0, MAX_MESSAGE_SIZE);
     if (dcs != 0) {
       logger(MSG_WARN, "%s: Sending message as a raw message, hope for the best\n", __func__);
       add_raw_sms_to_queue(message, sztmp, dcs, true);
     } else {
       logger(MSG_WARN, "%s: Sending the message as a pre-parsed GSM7 message\n", __func__);
-      sztmp = snprintf((char *)message, 160, "%s", msg_out->message);
+      sztmp = snprintf((char *)message, MAX_MESSAGE_SIZE, "%s", msg_out->message);
       add_sms_to_queue((uint8_t *)message, sztmp);
 
     }
@@ -1817,6 +1818,7 @@ int request_message_delete(int adspfd, uint8_t instance_id,
   ret = write(adspfd, request, sizeof(struct sms_delete_request));
   if (!ret) {
     logger(MSG_ERROR, "%s: Error sending request (ret %i)\n", __func__, ret);
+    free(request);
     return -EINVAL;
   }
   logger(MSG_INFO, "Request sent (%i bytes)\n", ret);
@@ -1833,6 +1835,7 @@ int request_message_delete(int adspfd, uint8_t instance_id,
     } else {
       logger(MSG_ERROR, "%s: Didn't get message %u (empty read)\n", __func__,
              message_id);
+      free(request);
       return -EINVAL;
     }
   } else {
@@ -1841,6 +1844,7 @@ int request_message_delete(int adspfd, uint8_t instance_id,
         "**** %s: Couldn't delete message %u (req failed, no answer from the "
         "baseband)\n",
         __func__, message_id);
+    free(request);
     return -EINVAL;
   }
   free(request);
@@ -1895,6 +1899,7 @@ int request_read_adsp_message(int adspfd, uint8_t instance_id,
   ret = write(adspfd, request, sizeof(struct sms_get_message_by_id));
   if (!ret) {
     logger(MSG_ERROR, "%s: Error sending request (ret %i)\n", __func__, ret);
+    free(request);
     return -EINVAL;
   }
   logger(MSG_INFO, "Request sent (%i bytes)\n", ret);
@@ -1911,6 +1916,7 @@ int request_read_adsp_message(int adspfd, uint8_t instance_id,
     } else {
       logger(MSG_ERROR, "%s: Didn't get message %u (empty read)\n", __func__,
              message_id);
+      free(request);
       return -EINVAL;
     }
   } else {
@@ -1918,6 +1924,7 @@ int request_read_adsp_message(int adspfd, uint8_t instance_id,
            "%s: Couldn't get message %u (req failed, no answer from the "
            "baseband)\n",
            __func__, message_id);
+    free(request);
     return -EINVAL;
   }
   free(request);
@@ -2188,9 +2195,9 @@ and without trying to decode the entire PDU, we care about everything
 which is *not* a 0x00 */
 
 
-void send_hello_world() {
-  char message[160];
-  snprintf(message, 160,
+void send_hello_world(void) {
+  char message[MAX_MESSAGE];
+  snprintf(message, MAX_MESSAGE,
            "Hi!\nWelcome to your (nearly) free modem\nSend \"help\" in this "
            "chat to get a list of commands you can run");
   clear_ifrst_boot_flag();

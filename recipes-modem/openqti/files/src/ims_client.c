@@ -114,7 +114,6 @@ int ims_request_sip_config() {
     free(pkt);
     return -EINVAL;
   }
-  size_t curr_offset = sizeof(struct qmux_packet) + sizeof(struct qmi_packet);
   add_pending_message(QMI_SERVICE_IMS_SETTINGS, (uint8_t *)pkt, pkt_len);
 
   free(pkt);
@@ -138,7 +137,6 @@ int ims_get_subscription() {
     free(pkt);
     return -EINVAL;
   }
-  size_t curr_offset = sizeof(struct qmux_packet) + sizeof(struct qmi_packet);
   add_pending_message(QMI_SERVICE_IMS_SETTINGS, (uint8_t *)pkt, pkt_len);
 
   free(pkt);
@@ -253,13 +251,13 @@ int ims_process_config_response(uint8_t *buf, size_t buf_len) {
   return 0;
 }
 
-int ims_process_active_subscription_status(uint8_t *buf, size_t buf_len) {
+static int ims_process_active_subscription_status(uint8_t *buf, size_t buf_len) {
   uint8_t tlvs[] = {
 	  IMS_ACTIVE_SUBSCRIPTION_PRIMARY,
 	  IMS_ACTIVE_SUBSCRIPTION_SECONDARY,
 	  IMS_ACTIVE_SUBSCRIPTION_TERTIARY,
   };
-  for (uint8_t i = 0; i < 13; i++) {
+  for (uint8_t i = 0; i < 3; i++) {
     struct subscription_status_indication *subscription;
     int offset = get_tlv_offset_by_id(buf, buf_len, tlvs[i]);
     if (offset > 0) {

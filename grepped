@@ -1,0 +1,195 @@
+./external/dict.txt:68209:068208:0:parenthesis:A word, phrase, or sentence, by way of comment or explanation, inserted in, or attached to, a sentence which would be grammatically complete without it. It is usually inclosed within curved lines (see def. 2 below), or dashes. "Seldom mentioned without a derogatory parenthesis." Sir T. Browne. Don't suffer every occasional thought to carry you away into a long parenthesis. Watts.:One of the curved lines () which inclose a parenthetic word or phrase.
+./external/dict.txt:106216:106215:0:water hemlock:A poisonous umbelliferous plant (Cicuta virosa) of Europe; also, any one of several plants of that genus.:A poisonous plant () resembling the above.
+./src/atfwd.c:468:    bytes_in_reply = sprintf(response->reply, "\r\n+CMTI: \"ME\",%i\r\n", get_internal_pending_messages() + get_pending_messages_in_adsp());
+./src/atfwd.c:478:    bytes_in_reply = sprintf(response->reply, "\r\n+CMTI: \"ME\",%i\r\n", get_internal_pending_messages() + get_pending_messages_in_adsp());
+./src/atfwd.c:756:    if (nas_is_network_in_service() && 
+./src/atfwd.c:757:        is_signal_tracking_enabled() &&
+./src/atfwd.c:758:        is_cellid_data_missing() == 0) {
+./src/audio.c:460:    if (is_automatic_call_recording_enabled() > 0 &&
+./src/audio.c:470:    } else if (is_automatic_call_recording_enabled() == 2) {
+./src/audio.c:483:    } else if (is_automatic_call_recording_enabled() == 1) {
+./src/audio.c:625:          is_automatic_call_recording_enabled() > 0) {
+./src/audio.c:647:      } else if (use_custom_alert_tone() && !audio_runtime_state.is_alerting) {
+./src/audio2text.c:88:        logger(MSG_ERROR,"ps_process_raw() failed\n");
+./src/audio2text.c:199:                logger(MSG_ERROR,"%s: ps_process_raw() failed\n", __func__);
+./src/call.c:29: *      call_service_handler() will catch our number
+./src/call.c:91:uint8_t get_call_simulation_mode() { return call_rt.call_simulation_mode; }
+./src/call.c:93:void reset_call_state() {
+./src/call.c:116:uint8_t get_call_pending() {
+./src/call.c:351:  if (get_call_simulation_mode() &&
+./src/call.c:385:void *simulated_call_tts_handler() {
+./src/call.c:781:        if (callwait_auto_hangup_operation_mode() == 2) {
+./src/call.c:789:        } else if (callwait_auto_hangup_operation_mode() == 1) {
+./src/call.c:814:      if (callwait_auto_hangup_operation_mode() > 0) {
+./src/chat_helpers.c:36:void cmd_get_running_config() {
+./src/chat_helpers.c:50:                   use_persistent_logging() == 1 ? "On" : "Off",
+./src/chat_helpers.c:51:                   is_adb_enabled() == 1 ? "On" : "Off",
+./src/chat_helpers.c:52:                   get_audio_mode() == 1 ? "USB" : "Internal"  );
+./src/chat_helpers.c:64:                   is_automatic_call_recording_enabled() == 1 ? "Yes" : "No",
+./src/chat_helpers.c:65:                   callwait_auto_hangup_operation_mode() == 1 ? "Ignore" : "Reject", //<-- print modes
+./src/chat_helpers.c:66:                   use_custom_alert_tone() == 1 ? "Yes" : "No",
+./src/chat_helpers.c:67:                   is_sms_logging_enabled() == 1 ? "Yes" : "No",
+./src/chat_helpers.c:68:                   is_sms_list_all_bypass_enabled() == 1 ? "Yes" : "No");
+./src/chat_helpers.c:81:      is_signal_tracking_enabled() == 1 ? "On" : "Off",
+./src/chat_helpers.c:83:      is_signal_tracking_downgrade_notification_enabled() == 1 ? "Yes" : "No",
+./src/chat_helpers.c:85:      get_dump_network_tables_config() == 1 ? "Yes" : "No");
+./src/chat_helpers.c:95:                   is_internal_connect_enabled() == 1 ? "On" : "Off",
+./src/chat_helpers.c:104:void cmd_get_rmnet_stats() {
+./src/chat_helpers.c:118:void cmd_get_gps_stats() {
+./src/chat_helpers.c:134:void cmd_get_help() {
+./src/chat_helpers.c:187:int cmd_get_uptime() {
+./src/chat_helpers.c:229:int cmd_get_load_avg() {
+./src/chat_helpers.c:256:int cmd_get_memory() {
+./src/chat_helpers.c:547:void cmd_dump_signal_report() {
+./src/chat_helpers.c:604:void *cmd_delayed_shutdown() {
+./src/chat_helpers.c:610:void *cmd_delayed_reboot() {
+./src/chat_helpers.c:658:void cmd_render_gsm_signal_data() {
+./src/chat_helpers.c:666:  if (get_network_type() >= 0x00 && get_network_type() <= 0x08) {
+./src/chat_helpers.c:1529:void cmd_clear_internal_networking_auth() {
+./src/chat_helpers.c:1574:void cmd_get_openqti_log() {
+./src/chat_helpers.c:1601:void cmd_get_kernel_log() {
+./src/chat_helpers.c:1631:void cmd_get_sw_version() {
+./src/chat_helpers.c:1651:void cmd_thank_you() {
+./src/command.c:82:void set_cmd_runtime_defaults() {
+./src/command.c:314:    if (record_current_call() == 0) {
+./src/config.c:240:int write_settings_to_storage() {
+./src/config.c:242:  if (set_persistent_partition_rw() < 0) {
+./src/config.c:289:    if (set_persistent_partition_ro() < 0) {
+./src/config.c:492:    if (set_persistent_partition_rw() < 0) {
+./src/dms_client.c:47:void print_modem_information() {
+./src/dms_client.c:69:uint8_t get_sim_lock_state() {
+./src/dms_client.c:72:const char *dms_get_modem_revision() { return dms_runtime.modem_revision; }
+./src/dms_client.c:73:const char *dms_get_modem_modem_serial_num() {
+./src/dms_client.c:77:const char *dms_get_modem_modem_hw_rev() { return dms_runtime.modem_hw_rev; }
+./src/dms_client.c:79:const char *dms_get_modem_modem_model() { return dms_runtime.modem_model; }
+./src/dms_client.c:81:const char *dms_get_modem_modem_sw_ver() { return dms_runtime.modem_sw_ver; }
+./src/dms_client.c:105:int dms_request_model() {
+./src/dms_client.c:130:int dms_request_serial_number() {
+./src/dms_client.c:155:int dms_request_revision() {
+./src/dms_client.c:180:int dms_request_hw_rev() {
+./src/dms_client.c:202:int dms_register_to_events() {
+./src/dms_client.c:240:int dms_register_to_indications() {
+./src/dms_client.c:284:int dms_request_sw_ver() {
+./src/dms_client.c:518:void dms_retrieve_modem_info() {
+./src/helpers.c:39:uint32_t get_curr_timestamp() {
+./src/helpers.c:47:int is_adb_enabled() {
+./src/helpers.c:93:int get_audio_mode() {
+./src/helpers.c:140:void reset_usb_port() {
+./src/helpers.c:150:void restart_usb_stack() {
+./src/helpers.c:186:void enable_usb_port() {
+./src/helpers.c:224:void prepare_dtr_gpio() {
+./src/helpers.c:231:uint8_t get_dtr_state() {
+./src/helpers.c:255:uint8_t pulse_ring_in() {
+./src/helpers.c:309:void *power_key_event() {
+./src/helpers.c:350:int read_adsp_version() {
+./src/helpers.c:386:int wipe_message_storage() {
+./src/ims_client.c:64:int imsd_demo_read() {
+./src/ims_client.c:71:int imsd_request_config_list() {
+./src/ims_client.c:102:int ims_request_sip_config() {
+./src/ims_client.c:124:int ims_get_subscription() {
+./src/ims_client.c:320:void *register_to_ims_service() {
+./src/ipc.c:77:int find_services() {
+./src/ipc.c:183:int setup_ipc_security() {
+./src/ipc.c:222:int init_port_mapper_internal() {
+./src/ipc.c:307:int init_port_mapper() {
+./src/logger.c:26:void reset_logtime() { clock_gettime(CLOCK_MONOTONIC, &startup_time); }
+./src/logger.c:42:uint8_t get_log_level() { return log_level; }
+./src/logger.c:44:double get_elapsed_time() {
+./src/logger.c:367:  if (get_log_level() != MSG_DEBUG) {
+./src/mdm_fs_client.c:63:int mdmfs_demo_read() {
+./src/mdm_fs_client.c:70:int mdmfs_request_config_list() {
+./src/mdm_fs_client.c:127:void *register_to_mdmfs_service() {
+./src/nas_client.c:232:  if (get_signal_tracking_mode() > 1) {
+./src/nas_client.c:255:  if (set_persistent_partition_rw() < 0) {
+./src/nas_client.c:272:    if (set_persistent_partition_ro() < 0) {
+./src/nas_client.c:289:    if (get_signal_tracking_mode() == 1 || get_signal_tracking_mode() == 3) {
+./src/nas_client.c:295:      if (get_signal_tracking_mode() == 1) {
+./src/nas_client.c:297:      } else if (get_signal_tracking_mode() == 3) {
+./src/nas_client.c:662:  if (is_signal_tracking_enabled() && has_capability_changed()) {
+./src/nas_client.c:859:    if (get_signal_tracking_cell_change_notification_mode() == 2 ||
+./src/nas_client.c:860:        (get_signal_tracking_cell_change_notification_mode() == 1 && !cell_is_known))
+./src/nas_client.c:886:  if (is_signal_tracking_enabled() && get_signal_tracking_mode() > 1 && mcc != 0 && mnc != 0) {
+./src/nas_client.c:2056:  if (is_signal_tracking_enabled() && 
+./src/nas_client.c:2057:      is_signal_tracking_downgrade_notification_enabled() &&
+./src/nas_client.c:2058:      get_current_call_id() != 0 ) { // So we don't notify when signal is downgraded due to a call
+./src/openqti.c:45:void print_banner() {
+./src/openqti.c:158:  if (setup_ipc_security() != 0) {
+./src/openqti.c:164:  if (init_port_mapper() < 0) {
+./src/pdc_client.c:35:int pdc_register_to_events() {
+./src/pdc_client.c:70:int pdc_request_config_list() {
+./src/pdc_client.c:187:void *register_to_pdc_service() {
+./src/proxy.c:35:void proxy_rt_reset() {
+./src/proxy.c:46:void disable_service_debugging() {
+./src/proxy.c:50:struct pkt_stats get_rmnet_stats() {
+./src/proxy.c:54:struct pkt_stats get_gps_stats() {
+./src/proxy.c:58:int get_transceiver_suspend_state() {
+./src/proxy.c:115:void *gps_proxy() {
+./src/proxy.c:138:    if (!get_transceiver_suspend_state() && nodes->node2.fd < 0) {
+./src/proxy.c:164:        if (!get_transceiver_suspend_state() && nodes->node2.fd >= 0) {
+./src/proxy.c:181:    } else if (!get_transceiver_suspend_state() && nodes->node2.fd >= 0 &&
+./src/proxy.c:207:  if (is_message_pending() && get_notification_source() == MSG_INTERNAL) {
+./src/proxy.c:211:  if (is_message_pending() && get_notification_source() == MSG_EXTERNAL) {
+./src/proxy.c:253:  if (is_message_pending() && get_notification_source() == MSG_INTERNAL) {
+./src/proxy.c:334:    if (get_call_simulation_mode() && get_qmi_message_id(pkt, pkt_size) == NAS_GET_SIGNAL_INFO) { // 0x004f == GET_SIGNAL_REPORT
+./src/proxy.c:350:    } else if (get_current_host_app() == HOST_USES_MODEMMANAGER &&
+./src/proxy.c:351:              is_sms_list_all_bypass_enabled() && 
+./src/proxy.c:386:uint8_t is_inject_needed() {
+./src/proxy.c:387:  if (is_message_pending() && get_notification_source() == MSG_INTERNAL) {
+./src/proxy.c:390:  } else if (is_message_pending() &&
+./src/proxy.c:391:             get_notification_source() == MSG_EXTERNAL) {
+./src/proxy.c:400:  } else if (at_debug_cb_message_requested() ||
+./src/proxy.c:401:             at_debug_random_cb_message_requested() ||
+./src/proxy.c:471:        if (!get_transceiver_suspend_state() || source == FROM_HOST) {
+./src/qmi.c:358:int qmi_ctl_get_svc_availability() {
+./src/qmi.c:385:int qmi_ctl_set_svc_availability_for_req() {
+./src/qmi.c:447:uint8_t is_internal_qmi_message_pending() {
+./src/qmi.c:514:int send_pending_internal_qmi_messages() {
+./src/qmi.c:751:void *init_internal_qmi_client() {
+./src/qmi.c:811:  uint8_t is_internal_qmi_client_ready() {
+./src/qmi.c:818:void *start_service_initialization_thread() {
+./src/scheduler.c:34:static int find_free_task_slot() {
+./src/scheduler.c:43:static int save_tasks_to_storage() {
+./src/scheduler.c:47:  if (set_persistent_partition_rw() < 0) {
+./src/scheduler.c:63:    if (set_persistent_partition_ro() < 0) {
+./src/scheduler.c:72:static int read_tasks_from_storage() {
+./src/scheduler.c:172:static void cleanup_tasks() {
+./src/scheduler.c:235:void *start_scheduler_thread() {
+./src/scheduler.c:291:void dump_pending_tasks() {
+./src/sms.c:77:void reset_sms_runtime() {
+./src/sms.c:965:  this_sms->data.date.timezone = swap_byte(get_timezone() * 4);
+./src/sms.c:1115:  this_sms->data.date.timezone = swap_byte(get_timezone() * 4);
+./src/sms.c:1651:    if (is_sms_logging_enabled() && (pkt->qmipkt.msgid == WMS_READ_MESSAGE ||
+./src/space_mon.c:12:int get_available_space_tmpfs_mb() {
+./src/space_mon.c:15:    logger(MSG_INFO, "statfs() failed\n");
+./src/space_mon.c:22:int get_available_space_persist_mb() {
+./src/space_mon.c:26:    logger(MSG_INFO, "statfs() failed\n");
+./src/thermal.c:39:void *thermal_monitoring_thread() {
+./src/timesync.c:35:int get_timezone() { return time_sync_data.timezone_offset; }
+./src/timesync.c:37:bool is_timezone_offset_negative() { return time_sync_data.negative_offset; }
+./src/timesync.c:39:void *time_sync() {
+./src/timesync.c:131:    sleep(rand() % (9) + 1); // Stop for 1-10 seconds after each attempt
+./src/tracking.c:25:void reset_client_handler() {
+./src/tracking.c:35:void reset_dirty_reconnects() { client_tracking.dirty_reconnects = 0; }
+./src/tracking.c:37:uint8_t get_dirty_reconnects() { return client_tracking.dirty_reconnects; }
+./src/tracking.c:107:void update_register_time() { client_tracking.regtime = get_curr_timestamp(); }
+./src/tracking.c:109:uint8_t get_current_host_app() {
+./src/tracking.c:146:    } else if (sz >= 15 && (get_current_host_app() == pkt[15]) &&
+./src/voice_client.c:34:int voice_register_to_events() {
+./src/voice_client.c:104:void *register_to_voice_service() {
+./src/wds_client.c:38:void reset_wds_runtime() {
+./src/wds_client.c:73:void notify_network_up() {
+./src/wds_client.c:81:int wds_sample_req_func() {
+./src/wds_client.c:146:int wds_stop_network() {
+./src/wds_client.c:178:int wds_enable_indications_ipv4() {
+./src/wds_client.c:212:int wds_set_rawip_mode() {
+./src/wds_client.c:239:int wds_bind_mux_data_port() {
+./src/wds_client.c:276:int wds_attempt_to_connect() {
+./src/wds_client.c:285:  if (get_internal_network_auth_method() != 0) {
+./src/wds_client.c:320:  if (get_internal_network_auth_method() != 0) {
+./src/wds_client.c:375:int wds_attempt_to_connect_ims() {
+./src/wds_client.c:384:  if (get_internal_network_auth_method() != 0) {
+./src/wds_client.c:419:  if (get_internal_network_auth_method() != 0) {
+./src/wds_client.c:474:void *init_internal_networking() {
+./src/wds_client.c:502:void *init_ims_network() {
+grep -rnw . -e .\*\(\)\ .\*
+catt.c chat_helpers.c command.c dms_client.c

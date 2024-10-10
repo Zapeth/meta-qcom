@@ -34,22 +34,22 @@ struct {
   bool stream_cb;
 } atfwd_runtime_state;
 
-void set_atfwd_runtime_default() {
+void set_atfwd_runtime_default(void) {
   atfwd_runtime_state.adb_enabled = false;
   atfwd_runtime_state.is_sms_notification_pending = false;
   atfwd_runtime_state.random_debug_cb = false;
   atfwd_runtime_state.debug_cb = false;
   atfwd_runtime_state.stream_cb = false;
 }
-bool at_debug_cb_message_requested() {
+bool at_debug_cb_message_requested(void) {
   return atfwd_runtime_state.debug_cb;
 }
 
-bool at_debug_random_cb_message_requested() {
+bool at_debug_random_cb_message_requested(void) {
   return atfwd_runtime_state.random_debug_cb;
 }
 
-bool at_debug_stream_cb_message_requested() {
+bool at_debug_stream_cb_message_requested(void) {
   return atfwd_runtime_state.stream_cb;
 }
 void send_cb_message_to_modemmanager(int usbfd, int message_id) {
@@ -158,7 +158,7 @@ void set_sms_notification_pending_state(bool en) {
   atfwd_runtime_state.is_sms_notification_pending = en;
 }
 
-bool get_sms_notification_pending_state() {
+bool get_sms_notification_pending_state(void) {
   return atfwd_runtime_state.is_sms_notification_pending;
 }
 
@@ -718,7 +718,7 @@ int init_atfwd(struct qmi_device *qmidev) {
   return 0;
 }
 
-void *start_atfwd_thread() {
+void *start_atfwd_thread(void) {
   int ret;
   fd_set readfds;
   uint8_t buf[MAX_PACKET_SIZE];

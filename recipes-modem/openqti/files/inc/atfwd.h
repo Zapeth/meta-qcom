@@ -205,20 +205,20 @@ struct at_command_respnse {
 } __attribute__((packed));
 
 void set_sms_notification_pending_state(bool en);
-void set_atfwd_runtime_default();
+void get_sms_notification_pending_state(void);
+void set_atfwd_runtime_default(void);
 void set_adb_runtime(bool mode);
 void build_atcommand_reg_request(int tid, const char *command, char *buf);
 int set_audio_profile(uint8_t io, uint8_t mode, uint8_t fsync, uint8_t clock,
                       uint8_t format, uint8_t sample, uint8_t num_slots,
                       uint8_t slot);
 
-void *start_atfwd_thread();
-char *get_adsp_version();
+void *start_atfwd_thread(void);
 
 /* DEBUG CB */
-bool at_debug_cb_message_requested();
-bool at_debug_random_cb_message_requested();
-bool at_debug_stream_cb_message_requested();
+bool at_debug_cb_message_requested(void);
+bool at_debug_random_cb_message_requested(void);
+bool at_debug_stream_cb_message_requested(void);
 
 void send_cb_message_to_modemmanager(int usbfd, int message_id);
 #define GET_ADSP_VER_CMD "AT+QGMR"

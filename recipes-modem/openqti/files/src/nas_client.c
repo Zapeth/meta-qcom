@@ -119,17 +119,17 @@ int is_cell_id_in_db(uint32_t cell_id, uint16_t lac) {
   return ret;
 }
 
-uint8_t is_cellid_data_missing() {
+uint8_t is_cellid_data_missing(void) {
   if (nas_is_network_in_service())
     return nas_runtime.cellid_data_missing;
   return 2;
 }
 
-void set_cellid_data_missing_as_requested() {
+void set_cellid_data_missing_as_requested(void) {
   nas_runtime.cellid_data_missing = 2;
 }
 
-void get_opencellid_data() {
+void get_opencellid_data(void) {
   uint8_t reply[MAX_MESSAGE_SIZE] = {0};
   size_t strsz = 0;
   char filename[256];
@@ -177,7 +177,7 @@ void get_opencellid_data() {
  * Hardcoded user notifications
  */
 
-void notify_database_unavailable() {
+void notify_database_unavailable(void) {
   uint8_t reply[MAX_MESSAGE_SIZE] = {0};
   size_t strsz =
       snprintf((char *)reply, MAX_MESSAGE_SIZE,
@@ -186,7 +186,7 @@ void notify_database_unavailable() {
   add_message_to_queue(reply, strsz);
 }
 
-void fallback_notify() {
+void fallback_notify(void) {
   uint8_t reply[MAX_MESSAGE_SIZE] = {0};
   size_t strsz = snprintf((char *)reply, MAX_MESSAGE_SIZE,
                           "Signal Tracking warning! I can't load any previous "
@@ -248,7 +248,7 @@ void notify_cellid_change(uint32_t cell_id, uint16_t lac) {
 /*
   Save & retrieve previous reports
 */
-int store_report_data() {
+int store_report_data(void) {
   FILE *fp;
   int ret;
   logger(MSG_DEBUG, "%s: Start\n", __func__);
@@ -278,7 +278,7 @@ int store_report_data() {
   return 0;
 }
 
-int load_report_data() {
+int load_report_data(void) {
   FILE *fp;
   int ret;
   struct network_status_reports reports[MAX_REPORT_NUM];
@@ -321,22 +321,22 @@ int load_report_data() {
  * Some getters
  */
 
-uint8_t *get_current_mcc() { return nas_runtime.curr_state.mcc; }
-uint8_t *get_current_mnc() { return nas_runtime.curr_state.mnc; }
-uint8_t get_network_type() { return nas_runtime.curr_state.network_type; }
+uint8_t *get_current_mcc(void) { return nas_runtime.curr_state.mcc; }
+uint8_t *get_current_mnc(void) { return nas_runtime.curr_state.mnc; }
+uint8_t get_network_type(void) { return nas_runtime.curr_state.network_type; }
 
-struct basic_network_status get_network_status() {
+struct basic_network_status get_network_status(void) {
   return nas_runtime.curr_state;
 }
 
 /* Used in command.c */
-struct nas_report get_current_cell_report() {
+struct nas_report get_current_cell_report(void) {
   return nas_runtime.data[nas_runtime.current_report].report;
 }
 
-uint8_t get_signal_strength() { return nas_runtime.curr_state.signal_level; }
+uint8_t get_signal_strength(void) { return nas_runtime.curr_state.signal_level; }
 
-uint8_t nas_is_network_in_service() {
+uint8_t nas_is_network_in_service(void) {
   if (nas_runtime.curr_state.service_capability.gprs ||
       nas_runtime.curr_state.service_capability.edge ||
       nas_runtime.curr_state.service_capability.hsdpa ||
@@ -351,7 +351,7 @@ uint8_t nas_is_network_in_service() {
   return 0;
 }
 
-uint8_t has_capability_changed() {
+uint8_t has_capability_changed(void) {
   if (memcmp(&nas_runtime.curr_state.service_capability,
              &nas_runtime.prev_state.service_capability,
              sizeof(struct service_capability)) == 0)
@@ -370,11 +370,8 @@ const char *get_nas_command(uint16_t msgid) {
   return "NAS: Unknown command\n";
 }
 
-int nas_register_to_events() {
-  size_t pkt_len = sizeof(struct qmux_packet) + sizeof(struct qmi_packet) +
-                   (33 * sizeof(struct qmi_generic_uint8_t_tlv));
-  uint8_t *pkt = malloc(pkt_len);
-  uint8_t tlvs[] = {
+int nas_register_to_events(void) {
+  const uint8_t tlvs[] = {
       NAS_SVC_INDICATION_SYS_SELECT,
       NAS_SVC_INDICATION_DDTM_EVENT,
       NAS_SVC_INDICATION_SERVING_SYS,
@@ -393,6 +390,7 @@ int nas_register_to_events() {
       NAS_SVC_INDICATION_PLMN_MODE_BIT,
       NAS_SVC_INDICATION_RTRE_CONFIG,
       NAS_SVC_INDICATION_IMS_PREFERENCE,
+
       NAS_SVC_INDICATION_EMERGENCY_STATE_READY,
       NAS_SVC_INDICATION_LTE_NETWORK_TIME,
       NAS_SVC_INDICATION_LTE_CARRIER_AGG_INFO,
@@ -408,8 +406,16 @@ int nas_register_to_events() {
       NAS_SVC_INDICATION_SUB_BLOCK_STATUS_INFO,
       NAS_SVC_INDICATION_EMERGENCY_911_SEARCH_FAILURE_INFO,
       NAS_SVC_INDICATION_ARFCN_LIST_INFO,
+
       NAS_SVC_INDICATION_GET_RF_AVAILABILITY,
   };
+  const size_t tlvs_count = sizeof(tlvs)/sizeof(*tlvs);
+  size_t pkt_len = sizeof(struct qmux_packet) + sizeof(struct qmi_packet) +
+                   //(33 * sizeof(struct qmi_generic_uint8_t_tlv));
+                   // 03b05d1ffb0e66eebc9efa311dfbfa7b938f66ff
+                   ((sizeof(nas_runtime.current_state.operator_name)+1) * sizeof(struct qmi_generic_uint8_t_tlv));
+                   //(tlvs_count * sizeof(struct qmi_generic_uint8_t_tlv));
+  uint8_t *pkt = malloc(pkt_len);
   memset(pkt, 0, pkt_len);
   if (build_qmux_header(pkt, pkt_len, 0x00, QMI_SERVICE_NAS, 0) < 0) {
     logger(MSG_ERROR, "%s: Error adding the qmux header\n", __func__);
@@ -423,7 +429,8 @@ int nas_register_to_events() {
     return -EINVAL;
   }
   size_t curr_offset = sizeof(struct qmux_packet) + sizeof(struct qmi_packet);
-  for (int i = 0; i < 19; i++) {
+  //for (int i = 0; i < 19; i++) {
+  for (int i = 0; i < tlvs_count; i++) {
     if (build_u8_tlv(pkt, pkt_len, curr_offset, tlvs[i], 1) < 0) {
       logger(MSG_ERROR, "%s: Error adding the TLV\n", __func__);
       free(pkt);
@@ -438,7 +445,7 @@ int nas_register_to_events() {
   return 0;
 }
 
-int nas_request_cell_location_info() { // QMI_NAS_GET_SIG_INFO
+int nas_request_cell_location_info(void) { // QMI_NAS_GET_SIG_INFO
   size_t pkt_len = sizeof(struct qmux_packet) + sizeof(struct qmi_packet);
   uint8_t *pkt = malloc(pkt_len);
   memset(pkt, 0, pkt_len);
@@ -460,7 +467,7 @@ int nas_request_cell_location_info() { // QMI_NAS_GET_SIG_INFO
   return 0;
 }
 
-int nas_request_signal_info() {
+int nas_request_signal_info(void) {
   size_t pkt_len = sizeof(struct qmux_packet) + sizeof(struct qmi_packet);
   uint8_t *pkt = malloc(pkt_len);
   memset(pkt, 0, pkt_len);
@@ -481,7 +488,7 @@ int nas_request_signal_info() {
   return 0;
 }
 
-int nas_get_ims_preference() {
+int nas_get_ims_preference(void) {
   size_t pkt_len = sizeof(struct qmux_packet) + sizeof(struct qmi_packet);
   uint8_t *pkt = malloc(pkt_len);
   memset(pkt, 0, pkt_len);
@@ -638,7 +645,7 @@ void parse_serving_system_message(uint8_t *buf, size_t buf_len) {
          nas_runtime.curr_state.packet_switch_attached == 1 ? "Yes" : "No");
 
   if (nas_runtime.prev_state.packet_switch_attached &&
-      !nas_runtime.prev_state.packet_switch_attached &&
+      !nas_runtime.curr_state.packet_switch_attached &&
       is_signal_tracking_enabled()) {
     uint8_t reply[MAX_MESSAGE_SIZE] = {0};
     size_t strsz = snprintf((char *)reply, MAX_MESSAGE_SIZE,
@@ -646,7 +653,7 @@ void parse_serving_system_message(uint8_t *buf, size_t buf_len) {
     add_message_to_queue(reply, strsz);
   }
   if (nas_runtime.prev_state.circuit_switch_attached &&
-      !nas_runtime.prev_state.circuit_switch_attached) {
+      !nas_runtime.curr_state.circuit_switch_attached) {
     uint8_t reply[MAX_MESSAGE_SIZE] = {0};
     size_t strsz = snprintf((char *)reply, MAX_MESSAGE_SIZE,
                             "Warning: Circuit switch detached!");
@@ -914,13 +921,15 @@ void update_cell_location_information(uint8_t *buf, size_t buf_len) {
       NAS_CELL_LAC_INFO_LTE_INFO_EXTENDED_INTER_EARFCN,
       NAS_CELL_LAC_INFO_WCDMA_INFO_EXTENDED_LTE_NEIGHBOUR_EARFCN,
       NAS_CELL_LAC_INFO_NAS_INFO_EMM_STATE,
+
       NAS_CELL_LAC_INFO_NAS_RRC_STATE,
       NAS_CELL_LAC_INFO_LTE_INFO_RRC_STATE,
   };
 
   logger(MSG_DEBUG, "%s: Found %u information segments in this message\n",
          __func__, count_tlvs_in_message(buf, buf_len));
-  for (uint8_t i = 0; i < 27; i++) {
+  //for (uint8_t i = 0; i < 27; i++) {
+  for (uint8_t i = 0; i < sizeof(available_tlvs)/sizeof(*available_tlvs); i++) {
     int offset = get_tlv_offset_by_id(buf, buf_len, available_tlvs[i]);
     if (offset > 0) {
       logger(MSG_DEBUG, "%s: TLV %.2x found at offset %.2x\n", __func__,
@@ -1437,12 +1446,14 @@ void log_cell_location_information(uint8_t *buf, size_t buf_len) {
       NAS_CELL_LAC_INFO_WCDMA_INFO_EXTENDED_LTE_NEIGHBOUR_EARFCN,
       NAS_CELL_LAC_INFO_NAS_INFO_EMM_STATE,
       NAS_CELL_LAC_INFO_NAS_RRC_STATE,
+
       NAS_CELL_LAC_INFO_LTE_INFO_RRC_STATE,
   };
 
   logger(MSG_DEBUG, "%s: Found %u information segments in this message\n",
          __func__, count_tlvs_in_message(buf, buf_len));
-  for (uint8_t i = 0; i < 27; i++) {
+  //for (uint8_t i = 0; i < 27; i++) {
+  for (uint8_t i = 0; i < sizeof(available_tlvs)/sizeof(*available_tlvs); i++) {
     int offset = get_tlv_offset_by_id(buf, buf_len, available_tlvs[i]);
     if (offset > 0) {
       logger(MSG_DEBUG, "%s: TLV %.2x found at offset %.2x\n", __func__,
@@ -2202,7 +2213,7 @@ int handle_incoming_nas_message(uint8_t *buf, size_t buf_len) {
   return 0;
 }
 
-void *register_to_nas_service() {
+void *register_to_nas_service(void) {
   load_report_data();
   nas_register_to_events();
   nas_get_ims_preference();

@@ -60,7 +60,7 @@ callaudio_stt_demo(char *filename) {
         if (config)
             free(config);
         speech_to_text.is_enabled = 0;
-
+        fclose(fh);
         return -1;
     }
     if ((decoder = ps_init(config)) == NULL) {
@@ -68,7 +68,7 @@ callaudio_stt_demo(char *filename) {
         if (config)
             free(config);
         speech_to_text.is_enabled = 0;
-
+        fclose(fh);
         return -1;
     }
 
@@ -105,7 +105,7 @@ callaudio_stt_demo(char *filename) {
 }
 
 /* launched from call thread */
-void *callaudio_stt_continuous()
+void *callaudio_stt_continuous(void)
 {
     ps_decoder_t *decoder;
     ps_config_t *config;
@@ -234,7 +234,7 @@ int
 callaudio_stt_demo(char *filename) {
     return 0;
 }
-void *callaudio_stt_continuous() {
+void *callaudio_stt_continuous(void) {
     return NULL;
 }
 #endif

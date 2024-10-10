@@ -31,16 +31,16 @@ struct {
  *
  */
 
-int find_free_task_slot() {
+static int find_free_task_slot() {
   for (int i = 0; i < MAX_NUM_TASKS; i++) {
-    if (sch_runtime.tasks[i].status == 0) {
+    if (sch_runtime.tasks[i].status == STATUS_FREE) {
       return i;
     }
   }
   return -ENOSPC;
 }
 
-int save_tasks_to_storage() {
+static int save_tasks_to_storage() {
   FILE *fp;
   int ret;
   logger(MSG_DEBUG, "%s: Start\n", __func__);
@@ -69,7 +69,7 @@ int save_tasks_to_storage() {
   return 0;
 }
 
-int read_tasks_from_storage() {
+static int read_tasks_from_storage() {
   FILE *fp;
   int ret;
   struct task_p tasks[MAX_NUM_TASKS];
@@ -91,7 +91,7 @@ int read_tasks_from_storage() {
   return 0;
 }
 
-void delay_task_execution(int taskID, uint8_t seconds) {
+static void delay_task_execution(int taskID, uint8_t seconds) {
   sch_runtime.tasks[taskID].time.exec_time += seconds;
 }
 
@@ -148,7 +148,7 @@ int remove_task(int taskID) {
     if (sch_runtime.tasks[taskID].status != STATUS_FREE) {
       ret = 0;
     }
-    sch_runtime.tasks[taskID].status = 0;
+    sch_runtime.tasks[taskID].status = STATUS_FREE;
     sch_runtime.tasks[taskID].param = 0;
     sch_runtime.tasks[taskID].type = 0;
     sch_runtime.tasks[taskID].time.hh = 0;
@@ -168,16 +168,8 @@ int remove_all_tasks_by_type(uint8_t task_type) {
   }
   return 0;
 }
-int update_task_status(int taskID, uint8_t status) {
-  if (taskID < MAX_NUM_TASKS) {
-    sch_runtime.tasks[taskID].status = status;
-    return 0;
-  }
 
-  return -EINVAL;
-}
-
-void cleanup_tasks() {
+static void cleanup_tasks() {
   bool needs_write = false;
   for (int i = 0; i < MAX_NUM_TASKS; i++) {
     if (sch_runtime.tasks[i].status == STATUS_DONE ||
@@ -192,9 +184,9 @@ void cleanup_tasks() {
     save_tasks_to_storage();
 }
 
-int run_task(int taskID) {
+static int run_task(int taskID) {
   logger(MSG_INFO, "%s: Running task %i\n", __func__, taskID);
-  if (taskID < 0 || taskID > MAX_NUM_TASKS) {
+  if (taskID < 0 || taskID >= MAX_NUM_TASKS) {
     logger(MSG_ERROR, "%s: Invalid task\n", __func__);
     return -EINVAL;
   }
